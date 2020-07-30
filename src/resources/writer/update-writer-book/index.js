@@ -2,12 +2,7 @@ const Joi = require('@hapi/joi');
 const writerService = require('resources/writer/writer.service');
 
 const validate = require('middlewares/validate');
-
-const booksSchema = Joi.object().keys({
-  id: Joi.string().required(),
-  title: Joi.string().required(),
-  genre: Joi.string().valid('novel', 'poem').required(),
-});
+const booksSchema = require('../book.schema');
 
 const schemaBooks = Joi.object({
   books: Joi.array().items(booksSchema),
@@ -18,19 +13,17 @@ const schemaDelete = Joi.object({
 });
 
 async function handlerUpdate(ctx) {
-  const data = await writerService.update({ _id: ctx.params.id }, (doc) => ({
-    ...doc,
-    ...ctx.validatedData.concat(doc.books),
-  }));
+  const data = await writerService.update(
+    { _id: ctx.params.id },
+    { $push: { books: ctx.validatedData } },
+  );
   ctx.body = data;
 }
 
 async function handlerDelete(ctx) {
-  const writer = await writerService.findOne({ _id: ctx.params.id });
-  const bookIndex = writer.books.findIndex((el) => el._id === ctx.request.body.bookId);
-  writer.books.splice(bookIndex, 1);
-  ctx.body = await writerService.update({ _id: ctx.params.id }, () => ({
+  ctx.body = await writerService.update({ _id: ctx.params.id }, (writer) => ({
     ...writer,
+    books: writer.books.filter((book) => book._id === ctx.request.body.bookId),
   }));
 }
 

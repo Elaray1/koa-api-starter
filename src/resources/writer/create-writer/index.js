@@ -1,12 +1,7 @@
 const Joi = require('@hapi/joi');
 const validate = require('middlewares/validate');
 const writerService = require('resources/writer/writer.service');
-
-const booksSchema = Joi.object().keys({
-  id: Joi.string().required(),
-  title: Joi.string().required(),
-  genre: Joi.string().valid('novel', 'poem').required(),
-});
+const booksSchema = require('../book.schema');
 
 const schema = Joi.object({
   firstName: Joi.string()

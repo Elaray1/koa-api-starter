@@ -1,10 +1,5 @@
 const Joi = require('@hapi/joi');
-
-const books = Joi.object().keys({
-  id: Joi.string().required(),
-  title: Joi.string().required(),
-  genre: Joi.string().valid('novel', 'poem').required(),
-});
+const booksSchema = require('./book.schema');
 
 const schema = Joi.object({
   _id: Joi.string(),
@@ -15,7 +10,7 @@ const schema = Joi.object({
   age: Joi.number()
     .required(),
   createdOn: Joi.date(),
-  books: Joi.array().items(books),
+  books: Joi.array().items(booksSchema),
 });
 
 module.exports = (obj) => schema.validate(obj, { allowUnknown: false });

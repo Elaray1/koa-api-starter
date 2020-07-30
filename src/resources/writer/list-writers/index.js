@@ -6,7 +6,7 @@ const validate = require('middlewares/validate');
 const schema = Joi.object({
   pageNumber: Joi.number().required(),
   documentsInPage: Joi.number().required(),
-  sortBy: Joi.string().valid('createdOn', 'firstName', 'lastName', 'id').default('firstName'),
+  sortBy: Joi.string().valid('createdOn', 'firstName', 'lastName', '_id').default('_id'),
   sortOrder: Joi.string().valid('desc', 'asc'),
 });
 
@@ -17,19 +17,18 @@ async function handler(ctx) {
     sortBy,
     sortOrder,
   } = ctx.request.body;
-  const data = await writerService.find();
-  const dataArr = data.results;
-  const writers = dataArr.splice(pageNumber * documentsInPage, documentsInPage);
-  const sortWriters = writers.sort((a, b) => {
-    if (ctx.request.body[sortOrder] === 'desc') {
-      return a[sortBy] >= b[sortBy];
-    }
-    return a[sortBy] < b[sortBy];
-  });
+  const sortOrderNumber = sortOrder === 'asc' ? 1 : -1;
+  const sortedWritersList = (
+    await writerService.find({}, {
+      page: pageNumber,
+      perPage: documentsInPage,
+      sort: { [sortBy]: sortOrderNumber },
+    })
+  );
   ctx.body = {
-    data: sortWriters,
+    data: sortedWritersList,
     meta: {
-      numberOfAllDocuments: sortWriters.length,
+      numberOfAllDocuments: documentsInPage,
     },
   };
 }
