@@ -21,10 +21,10 @@ async function handlerUpdate(ctx) {
 }
 
 async function handlerDelete(ctx) {
-  ctx.body = await writerService.update({ _id: ctx.params.id }, (writer) => ({
-    ...writer,
-    books: writer.books.filter((book) => book._id === ctx.request.body.bookId),
-  }));
+  ctx.body = await writerService.update(
+    { _id: ctx.params.id },
+    { $pull: { books: { $in: [ctx.request.body.bookId] } } },
+  );
 }
 
 async function handlerPost(ctx) {

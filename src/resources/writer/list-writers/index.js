@@ -18,7 +18,7 @@ async function handler(ctx) {
     sortOrder,
   } = ctx.request.body;
   const sortOrderNumber = sortOrder === 'asc' ? 1 : -1;
-  const sortedWritersList = (
+  const sortedWritersObj = (
     await writerService.find({}, {
       page: pageNumber,
       perPage: documentsInPage,
@@ -26,9 +26,10 @@ async function handler(ctx) {
     })
   );
   ctx.body = {
-    data: sortedWritersList,
+    data: sortedWritersObj.results,
     meta: {
-      numberOfAllDocuments: documentsInPage,
+      numberOfAllDocuments: sortedWritersObj.count,
+      totalPages: sortedWritersObj.pagesCount,
     },
   };
 }
