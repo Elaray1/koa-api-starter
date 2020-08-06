@@ -23,7 +23,7 @@ async function handlerUpdate(ctx) {
 async function handlerDelete(ctx) {
   ctx.body = await writerService.update(
     { _id: ctx.params.id },
-    { $pull: { books: { $in: [ctx.request.body.bookId] } } },
+    { $pull: { books: { _id: ctx.request.body.bookId } } },
   );
 }
 
