@@ -15,14 +15,16 @@ const schema = Joi.object({
 
 async function handler(ctx) {
   const {
-    firstName, lastName, age, books,
+    firstName, lastName, age, books, _id,
   } = ctx.request.body;
   const data = await writerService.create({
+    _id,
     firstName,
     lastName,
     age,
     books,
   });
+  ctx.status = 200;
   ctx.body = data;
 }
 
